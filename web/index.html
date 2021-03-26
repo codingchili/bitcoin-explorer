@@ -5,66 +5,71 @@
     <meta name="assignment" content="Bitcoin Block Explorer P1">
     <title>Python Block Explorer</title>
     <style>
-        .item {
-            white-space: pre;
-            border: 1px solid;
-            border-radius: 2px;
-            display: block;
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #212121;
+            color: #fff;
+            margin: 0;
+            font-family: 'RoboX', 'Emoji', sans-serif;
+            width: 100%;
+            min-height: 100vh;
+            padding: 0;
+
+            cursor: url("images/icon/cursor.png"), auto;
+            --bunny-cursor: url("images/icon/cursor.png"), auto;
+            --bunny-cursor-pointer: url("images/icon/cursor-hover.png"), pointer;
+            --bunny-cursor-caret: url("images/icon/cursor-hover.png"), pointer;
+            --bunny-input-font: 'RoboX', 'Emoji';
+        }
+
+        .element {
+            animation: fadeIn ease 0.8s;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0
+            }
+            100% {
+                opacity: 1
+            }
+        }
+
+        *::-webkit-scrollbar {
+            width: 0.4em;
+            height: 0.4em;
+        }
+
+        *::-webkit-scrollbar-track {
+            background-color: #00000000;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background-color: #646464;
+        }
+
+        ::selection {
+            color: rgb(0, 176, 255);
+        }
+
+        @font-face {
+            font-family: "RoboX";
+            src: local("Roboto"), url("font/Roboto-Regular.ttf");
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: "Emoji";
+            src: local("Noto Color Emoji"), local("Segoe UI Emoji"), url("font/NotoColorEmoji.ttf");
+            font-display: swap;
         }
     </style>
+    <script src="script/bitcoin-explorer.js" type="module"></script>
 </head>
 <body>
-
-<div id="header">
-
-</div>
-
-<script type="module">
-    let header = document.querySelector('#header');
-    let log = (data) => {
-        let span = document.createElement("span");
-        span.classList.add("item");
-        span.innerText = data;
-        header.appendChild(span);
-    }
-
-    function call(method, data) {
-        return fetch(`http://localhost:8080/api/${method}`, {
-            headers: {"Content-Type": "application/json"},
-            method: "post",
-            body: JSON.stringify(data ?? {})
-        }).then(response => response.json())
-            .then(response => {
-                if (response.error) {
-                    alert(response.error);
-                } else {
-                    return response.result;
-                }
-            }).catch((e) => {
-                alert(e.message);
-            })
-    }
-
-    call("info").then(info => {
-        log(JSON.stringify(info, null, 4));
-    });
-
-    call("blockhash", {index: 137696}).then(hash => {
-        call("block", {hash: hash}).then(block => {
-            log(JSON.stringify(block, null, 4));
-
-            block.tx.forEach(tx => call("txinfo", {txid: tx}).then(transaction => {
-                log(JSON.stringify(transaction, null, 4));
-            }));
-        });
-        log(JSON.stringify(hash, null, 4));
-    })
-
-    call("outputs", {address: "1AdB57ttr9h4rJSQBvKXpbcfXaAmp8gtqR"}).then(transactions => {
-        transactions.forEach((transaction) => {
-           // log(JSON.stringify(transaction, null, 4));
-        })
-    })
-</script>
+    <bitcoin-explorer></bitcoin-explorer>
 </body>
 </html>

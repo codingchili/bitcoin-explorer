@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bunny Components - Demo</title>
+    <style>
+        @font-face {
+            font-family: Roboto Bold;
+            src: url("fonts/static/RobotoSlab-Bold.ttf") format("ttf");
+        }
+
+        body {
+            background-color: #212121;
+            font-family: 'Roboto', 'Noto', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-bottom: 64px;
+        }
+
+        bunny-progress {
+            margin-top: 32px;
+            margin-left: 8px;
+            margin-right: 8px;
+        }
+
+        h2 {
+            margin-left: 32px;
+        }
+
+        .description, .component {
+            padding-left: 12px;
+            padding-right: 12px;
+            padding-bottom: 24px;
+        }
+
+        .description {
+            text-align: center;
+        }
+
+        .usage > pre {
+            white-space: pre;
+            margin: 0;
+        }
+
+        code {
+            padding: 0;
+            margin: 0;
+            margin-bottom: -28px;
+        }
+
+        #page-header {
+            width: 80%;
+            text-align: center;
+            margin: 48px auto;
+        }
+
+        .component-demo {
+            margin-top: 48px;
+        }
+
+        bunny-box {
+            margin: auto;
+            max-width: 684px;
+        }
+
+        .flex {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        a, a:active, a:visited, a:focus {
+            color: rgb(0, 176, 255);
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #ffffff;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            /*background: var(--accent-color);*/
+            background-color: #646464;
+            opacity: 0.76;
+        }
+
+        ::selection {
+            background: rgb(255, 119, 0);
+            color: white;
+        }
+    </style>
+
+    <link rel="stylesheet"
+          href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/styles/androidstudio.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/highlight.min.js"></script>
+
+    <script type="module">
+        import('./bunny-progress.js');
+        import('./bunny-spinner.js');
+        import('./bunny-button.js');
+        import('./bunny-box.js');
+        import('./bunny-input.js');
+        import('./bunny-tooltip.js');
+        import('./bunny-tab.js');
+        import('./bunny-pages.js');
+        import('./bunny-toast.js');
+        import('./bunny-color.js');
+        import('./bunny-switch.js');
+        import('./bunny-slider.js');
+
+        hljs.initHighlightingOnLoad();
+    </script>
+</head>
+
+<body>
+
+<div id="page-header">
+    <h2>bunny-components</h2>
+    <span>Material Component pack by codingchili@github only using lit-html.</span>
+    <br><br>
+    <span><code>npm install --save codingchili/bunny-&lt;name&gt;</code></span>
+</div>
+
+
+<bunny-box class="component-demo">
+    <h2>bunny-progress</h2>
+    <style for="bunny-progress">
+        .one {
+            --bunny-progress-active-color: #70e795;
+            --bunny-progress-height: 8px;
+            --bunny-progress-container-color: #646464;
+        }
+
+        .two {
+            --bunny-progress-active-color: #ffc800;
+            --bunny-progress-container-color: #646464;
+        }
+
+        .three {
+            --bunny-progress-active-color: #f37b2f;
+            --bunny-progress-container-color: #646464;
+        }
+    </style>
+    <div class="component">
+        <bunny-progress value="20" class="one"></bunny-progress>
+        <bunny-progress value="40" class="two"></bunny-progress>
+        <bunny-progress value="60" class="three"></bunny-progress>
+    </div>
+    <div class="description">
+        Shows a horizontal progress bar with themable and animatable progress.
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-progress.js"/&gt;
+
+&lt;style&gt;
+    bunny-progress {
+        --bunny-progress-transition-timing-function: ease-out;
+        --bunny-progress-transition-duration: 0.16s;
+        --bunny-progress-height: 8px;
+        --bunny-progress-active-color: #ffcc800;
+        --bunny-progress-container-color: #484848;
+    }
+&lt;/style&gt;
+
+&lt;bunny-progress value="20" max="100"&gt;&lt;/bunny-progress&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-progress">
+        setInterval(() => {
+            let bars = document.querySelectorAll('bunny-progress');
+            let progress = Math.random() * 100;
+            for (let bar of bars) {
+                bar.value = progress;
+            }
+        }, 2000);
+    </script>
+</bunny-box>
+
+<bunny-box class="component-demo">
+    <h2>bunny-spinner</h2>
+    <style for="bunny-progress">
+
+        .two {
+            --bunny-spinner-color: #70e795;
+        }
+
+        .four {
+            --bunny-spinner-color: #f37b2f;
+        }
+    </style>
+    <div class="component">
+        <div class="flex">
+            <bunny-spinner enabled spinner text="processing.."></bunny-spinner>
+            <bunny-spinner class="two" enabled spinner text="processing.."></bunny-spinner>
+        </div>
+
+        <div class="flex">
+            <bunny-spinner enabled text="waiting.."></bunny-spinner>
+            <bunny-spinner class="four" enabled text="waiting.."></bunny-spinner>
+        </div>
+    </div>
+    <div class="description" style="margin-top: -32px;">
+        Shows a loading indicator used for processing or waiting for a server response.
+        <br>Animations are from <a href="http://loading.io/">loading.io</a>
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-spinner.js"/&gt;
+
+&lt;style&gt;
+    bunny-spinner {
+        --bunny-spinner-color: #70e795;
+    }
+&lt;/style&gt;
+
+&lt;bunny-spinner text="waiting.." enabled&gt;&lt;/bunny-spinner&gt;
+&lt;bunny-spinner text="processing.." spinner enabled&gt;&lt;/bunny-spinner&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-spinner">
+    </script>
+</bunny-box>
+
+
+<bunny-box class="component-demo">
+    <h2>bunny-button</h2>
+    <style for="bunny-progress">
+
+        .two {
+            --bunny-button-color: #70e795;
+        }
+
+        .three {
+            --bunny-button-color: #f37b2f;
+        }
+
+        bunny-button {
+            margin-top: 12px;
+        }
+    </style>
+    <div class="component">
+        <bunny-button>text button</bunny-button>
+        <bunny-button class="two" primary>styled green button</bunny-button>
+        <bunny-button class="three" primary>styled orange button</bunny-button>
+        <bunny-button primary>primary default button</bunny-button>
+    </div>
+    <div class="description">
+        A regular button, attach an onclick event handler to do something.
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-button.js"/&gt;
+
+&lt;style&gt;
+    bunny-button {
+        --bunny-button-color: #70e795;
+        --bunny-button-text-color: #fff;
+    }
+&lt;/style&gt;
+
+&lt;bunny-button text="click"&gt;click me&lt;/bunny-button&gt;
+&lt;bunny-button&gt;cliek me now&lt;/bunny-button&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-button">
+        document.querySelectorAll('bunny-button').forEach(button => {
+            button.addEventListener('click', () => alert('button-click'));
+        });
+    </script>
+</bunny-box>
+
+<bunny-box class="component-demo">
+    <h2>bunny-input</h2>
+    <style for="bunny-input">
+        .five {
+            --bunny-input-color: #70e795;
+            --bunny-input-focus: #f37b2f;
+            --bunny-input-label: #ff0000;
+            --bunny-input-selection: #f37b2f;
+        }
+
+        bunny-input[disabled]::part(input) {
+            text-align: center;
+        }
+
+    </style>
+    <div class="component">
+        <bunny-input id="ons" text="no label or placeholder."></bunny-input>
+        <bunny-input text="placeholder" placeholder="placeholder text"></bunny-input>
+        <bunny-input label="label" placeholder="placeholder text">text input</bunny-input>
+        <bunny-input text="password" label="password" type="password"></bunny-input>
+        <bunny-input class="five" text="styled" label="colors" text="input text"></bunny-input>
+        <bunny-input label="disabled" text="disabled input" disabled></bunny-input>
+    </div>
+    <div class="description">
+        A simple input field with support for placeholder/label.
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-input.js"/&gt;
+
+&lt;style&gt;
+    .styled {
+        --bunny-input-color: #70e795;
+        --bunny-input-focus: #f37b2f;
+        --bunny-input-label: #ff0000;
+        --bunny-input-selection: #f37b2f;
+    }
+&lt;/style&gt;
+
+&lt;bunny-input text="no label or placeholder."&gt;&lt;/bunny-input&gt;
+&lt;bunny-input text="placeholder" placeholder="placeholder text"&gt;&lt;/bunny-input&gt;
+&lt;bunny-input label="label" placeholder="placeholder text"&gt;text input&lt;/bunny-input&gt;
+&lt;bunny-input text="password" label="password" type="password"&gt;&lt;/bunny-input&gt;
+&lt;bunny-input class="styled" text="styled" label="colors"&gt;&lt;/bunny-input&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-input">
+    </script>
+</bunny-box>
+
+<bunny-box class="component-demo">
+    <h2>bunny-tooltip</h2>
+    <style for="bunny-tooltip">
+        #tooltip-target {
+            width: 128px;
+            user-select: none;
+        }
+
+        .tooltippable-text {
+            padding: 12px;
+            text-align: center;
+            display: block;
+        }
+    </style>
+    <div class="component" style="position: relative">
+        <bunny-box id="tooltip-target">
+            <span class="tooltippable-text">hover me</span>
+        </bunny-box>
+        <bunny-tooltip location="top">location="top"</bunny-tooltip>
+
+        <bunny-tooltip location="left" for="tooltip-target">location="left"</bunny-tooltip>
+        <bunny-tooltip location="right" for="tooltip-target">location="right"</bunny-tooltip>
+        <bunny-tooltip location="bottom" for="tooltip-target">location="bottom"</bunny-tooltip>
+    </div>
+    <div class="description">
+        A tooltip with support for popup location and complex content.
+        <br>
+        can target a specific node using <code>target</code> or previous sibling by default.
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-tooltip.js"/&gt;
+
+<-- automatically targets previous node in tree. -->
+&lt;div id="target"&gt;tooltippable&lt;/div&gt;
+&lt;bunny-tooltip location="top"&gt;location="top"&lt;/bunny-tooltip&gt;
+
+<-- cannot use previous node, use explicit 'for' to set target. -->
+&lt;bunny-tooltip location="bottom" for="target"&gt;location="bottom"&lt;/bunny-tooltip&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-input">
+    </script>
+</bunny-box>
+
+<bunny-box class="component-demo">
+    <h2>bunny-pages</h2>
+    <style for="bunny-tooltip">
+        div[slot="pages"] > div {
+            padding: 24px;
+        }
+
+        bunny-tab {
+            --bunny-tab-active: #f37b2f;
+            --bunny-tab-background: #484848;
+            --bunny-tab-ripple: #ff0000;
+        }
+    </style>
+    <div class="component" style="position: relative">
+        <bunny-pages>
+            <div slot="tabs">
+                <bunny-tab active>Tab 1</bunny-tab>
+                <bunny-tab>Tab 2</bunny-tab>
+                <bunny-tab>Tab 3</bunny-tab>
+            </div>
+            <div slot="pages">
+                <div>Page 1</div>
+                <div>Page 2</div>
+                <div>Page 3</div>
+            </div>
+        </bunny-pages>
+    </div>
+    <div class="description">
+        Bunny pages for tabbed content, requires bunny-tabs.
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-pages.js"/&gt;
+&lt;script type="module" src="bunny-tab.js"/&gt;
+
+&lt;style&gt;
+    bunny-tab {
+        --bunny-tab-active: #f37b2f;
+        --bunny-tab-background: #484848;
+        --bunny-tab-ripple: #ff0000;
+    }
+&lt;/style&gt;
+
+&lt;bunny-pages&gt;
+    &lt;div slot="tabs"&gt;
+        &lt;bunny-tab active&gt;Tab 1&lt;/bunny-tab&gt;
+        &lt;bunny-tab&gt;Tab 2&lt;/bunny-tab&gt;
+        &lt;bunny-tab&gt;Tab 3&lt;/bunny-tab&gt;
+    &lt;/div&gt;
+    &lt;div slot="pages"&gt;
+        &lt;div&gt;Page 1&lt;/div&gt;
+        &lt;div&gt;Page 2&lt;/div&gt;
+        &lt;div&gt;Page 3&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/bunny-pages&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-input">
+    </script>
+</bunny-box>
+
+<bunny-box class="component-demo">
+    <h2>bunny-toast</h2>
+    <style for="bunny-tooltip">
+
+    </style>
+    <div class="component" style="position: relative;">
+        <bunny-toast></bunny-toast>
+        <bunny-button id="toastmaster" primary>toast me!</bunny-button>
+    </div>
+    <div class="description">
+        A toaster to display feedback to the user.
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-toast.js"/&gt;
+
+&lt;style&gt;
+    bunny-tab {
+        --bunny-tab-active: #f37b2f;
+        --bunny-tab-background: #484848;
+        --bunny-tab-ripple: #ff0000;
+    }
+&lt;/style&gt;
+
+&lt;bunny-toast&gt;
+&lt;/bunny-toast&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-toast">
+        document.querySelector('#toastmaster').addEventListener('mousedown', () => {
+            document.querySelector('bunny-toast').open('get toasted.');
+        });
+    </script>
+</bunny-box>
+
+<bunny-box class="component-demo">
+    <h2>bunny-color</h2>
+    <style for="bunny-color">
+        bunny-color {
+            margin-left: 6px;
+        }
+    </style>
+    <div class="component" style="position: relative;display: flex;justify-content: center;">
+        <bunny-color hex="#70e795"></bunny-color>
+        <bunny-color hex="#ffc800"></bunny-color>
+        <bunny-color hex="#f37b2f"></bunny-color>
+        <bunny-color></bunny-color>
+    </div>
+    <div class="description">
+        Simple color picker.
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-color.js"/&gt;
+
+&lt;style&gt;
+    bunny-color {
+        --bunny-color: #f00;
+    }
+&lt;/style&gt;
+
+&lt;bunny-color hex="#70e795"&gt;&lt;/bunny-color&gt;
+&lt;bunny-color hex="#ffc800"&gt;&lt;/bunny-color&gt;
+&lt;bunny-color hex="#f37b2f"&gt;&lt;/bunny-color&gt;
+&lt;bunny-color &gt;&lt;/bunny-color&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-color">
+        document.querySelector('bunny-color').addEventListener('input', (e) => {
+            console.log(e);
+        });
+    </script>
+</bunny-box>
+
+<bunny-box class="component-demo">
+    <h2>bunny-switch</h2>
+    <style for="bunny-switch">
+        .switch-container {
+            width: 164px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        bunny-switch {
+            margin: 4px;
+            margin-top: -2px;
+        }
+
+        .switch-blue-orange {
+            --bunny-switch-on: #00b0ff;
+            --bunny-switch-off: #ef6000;
+        }
+    </style>
+    <div class="component">
+        <div class="switch-container">
+            <div>Awesome</div>
+            <bunny-switch active></bunny-switch>
+        </div>
+        <div class="switch-container">
+            <div>Broken</div>
+            <bunny-switch></bunny-switch>
+        </div>
+        <div class="switch-container">
+            <div>Color Style</div>
+            <bunny-switch class="switch-blue-orange" active></bunny-switch>
+        </div>
+        <div class="switch-container">
+            <div>NoScope 360</div>
+            <bunny-switch active disabled></bunny-switch>
+        </div>
+    </div>
+    <div class="description">
+        switch with two states.
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-switch.js"/&gt;
+
+&lt;style&gt;
+    .switch-blue-orange {
+        --bunny-switch-on: #70e795;
+        --bunny-switch-off: #f37b2f;
+    }
+&lt;/style&gt;
+
+&lt;bunny-switch active&gt;&lt;/bunny-switch&gt;
+&lt;bunny-switch&gt;&lt;/bunny-switch&gt;
+&lt;bunny-switch class="switch-blue-orange" active&gt;&lt;/bunny-switch&gt;
+&lt;bunny-switch disabled active&gt;&lt;/bunny-switch&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-switch">
+        document.querySelectorAll('bunny-switch')
+            .forEach(slider => slider.addEventListener('change', (e) => {
+                console.log(e);
+            }));
+    </script>
+</bunny-box>
+
+
+<bunny-box class="component-demo">
+    <h2>bunny-slider</h2>
+    <style for="bunny-slider">
+        .slider-container {
+            width: 324px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        bunny-slider {
+            margin: -2px 4px 4px;
+            width: 192px;
+        }
+
+        .pink {
+            --bunny-slider-pin: #ff00cc;
+        }
+    </style>
+    <div class="component">
+        <div class="slider-container">
+            <div>Awesome</div>
+            <bunny-slider current="40"></bunny-slider>
+        </div>
+        <div class="slider-container">
+            <div>Broken</div>
+            <bunny-slider end="10" start="8" current="9.5"></bunny-slider>
+        </div>
+        <div class="slider-container">
+            <div>Bunny</div>
+            <bunny-slider end="20" disabled></bunny-slider>
+        </div>
+        <div class="slider-container">
+            <div>NoScope 360</div>
+            <bunny-slider class="pink" start="1000" end="5000" current="1500"></bunny-slider>
+        </div>
+    </div>
+    <div class="description">
+        Slider selector.
+    </div>
+    <div class="usage">
+        <pre><code class="html">
+&lt;script type="module" src="bunny-slider.js"/&gt;
+
+&lt;style&gt;
+    --bunny-slider-pin: #ff00cc;
+&lt;/style&gt;
+
+&lt;bunny-slider&gt;&lt;/bunny-slider&gt;
+&lt;bunny-slider"&gt;&lt;/bunny-slider&gt;
+            </code>
+        </pre>
+    </div>
+    <script for="bunny-slider">
+        document.querySelectorAll('bunny-slider')
+            .forEach(slider => slider.addEventListener('change', (e) => {
+                console.log(e);
+            }));
+    </script>
+</bunny-box>
+</body>
+</html>

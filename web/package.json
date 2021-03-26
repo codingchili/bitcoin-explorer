@@ -1,0 +1,15 @@
+{
+  "name": "bitcoin-explorer",
+  "version": "1.0.0",
+  "description": "Just another block explorer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Robin Duda",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "ink-ripple": "^1.0.0",
+    "lit-html": "^1.3.0"
+  }
+}
