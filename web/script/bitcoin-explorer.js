@@ -54,12 +54,21 @@ class BitcoinExplorer extends HTMLElement {
         let index = /^[0-9]*$/.test(this.input.value);
         let transaction = this.input.value.length === 64; // hex encoded 256-bit hash.
 
-        if (index) {
-            this._index(parseInt(this.input.value));
-        } else if (transaction) {
-            this._txinfo(this.input.value);
+        if (this.input.value.length === 0) {
+            let placeholder = document.createElement('span');
+            this.hits.textContent = "";
+            placeholder.id = "hits-placeholder";
+            placeholder.innerHTML = "&#x1F680;";
+            this.placeholder = placeholder;
+            this.hits.appendChild(placeholder);
         } else {
-            this._outputs(this.input.value);
+            if (index) {
+                this._index(parseInt(this.input.value));
+            } else if (transaction) {
+                this._txinfo(this.input.value);
+            } else {
+                this._outputs(this.input.value);
+            }
         }
     }
 
@@ -190,7 +199,7 @@ class BitcoinExplorer extends HTMLElement {
                     margin: 32px 32px 16px;
                 }
 
-                .hits-placeholder {
+                #hits-placeholder {
                     font-size: 4em;
                     animation: rocket-x 1.5s ease infinite, rocket-y 1s linear infinite;
                     display: block;
@@ -240,9 +249,9 @@ class BitcoinExplorer extends HTMLElement {
                 <bunny-input autofocus placeholder="Tx hash, block index or btc address.. "></bunny-input>
                 <bunny-button primary>Search</bunny-button>
                 <div id="hits">
-        <span class="hits-placeholder">
-            &#x1F680;
-        </span>
+                    <span id="hits-placeholder">
+                        &#x1F680;
+                    </span>
                 </div>
             </bunny-box>
 
@@ -269,6 +278,7 @@ class BitcoinExplorer extends HTMLElement {
         this.stats = this.querySelector('#stats-container');
         this.footer = this.querySelector('#footer');
         this.button = this.querySelector('#footer');
+        this.placeholder = this.querySelector('#hits-placeholder');
         this.input.focus();
     }
 }
