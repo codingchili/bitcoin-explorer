@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="author" content="Robin Duda, 19931019-5293">
+    <meta name="assignment" content="Bitcoin Block Explorer P1">
+    <title>Python Block Explorer</title>
+    <style>
+        .item {
+            white-space: pre;
+            border: 1px solid;
+            border-radius: 2px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div id="header">
+
+</div>
+
+<script type="module">
+    let header = document.querySelector('#header');
+    let log = (data) => {
+        let span = document.createElement("span");
+        span.classList.add("item");
+        span.innerText = data;
+        header.appendChild(span);
+    }
+
+    function call(method, data) {
+        return fetch(`http://localhost:8080/api/${method}`, {
+            headers: {"Content-Type": "application/json"},
+            method: "post",
+            body: JSON.stringify(data ?? {})
+        }).then(response => response.json())
+            .then(response => {
+                if (response.error) {
+                    alert(response.error);
+                } else {
+                    return response.result;
+                }
+            }).catch((e) => {
+                alert(e.message);
+            })
+    }
+
+    call("info").then(info => {
+        log(JSON.stringify(info, null, 4));
+    });
+
+    call("blockhash", {index: 137696}).then(hash => {
+        call("block", {hash: hash}).then(block => {
+            log(JSON.stringify(block, null, 4));
+
+            block.tx.forEach(tx => call("txinfo", {txid: tx}).then(transaction => {
+                log(JSON.stringify(transaction, null, 4));
+            }));
+        });
+        log(JSON.stringify(hash, null, 4));
+    })
+
+    call("outputs", {address: "1AdB57ttr9h4rJSQBvKXpbcfXaAmp8gtqR"}).then(transactions => {
+        transactions.forEach((transaction) => {
+            log(JSON.stringify(transaction, null, 4));
+        })
+    })
+</script>
+</body>
+</html>
