@@ -1,6 +1,7 @@
 import asyncio
 import aiohttp
 import json
+import hashlib
 
 from server.log import log
 
@@ -11,40 +12,22 @@ BLOCK_TAIL_LIMIT = 2000
 class BTCRPC:
 
     def __init__(self, username, password):
-        # simple cache, no limit to how big this can get..
-        self.index_to_hash = {}
-        self.blocks = {}
-        self.transactions = {}
-        con = aiohttp.TCPConnector(limit=32)
+        con = aiohttp.TCPConnector(limit=128)
         auth = aiohttp.BasicAuth(username, password)
+        self.cache = {}
         self.session = aiohttp.ClientSession(connector=con, auth=auth)
 
     async def info(self):
-        return await (self.call({"method": "getblockchaininfo"}))
+        return await self.call({"method": "getblockchaininfo"}, cache=False)
 
     async def blockhash(self, index):
-        if index in self.index_to_hash:
-            return self.index_to_hash[index]
-        else:
-            hash = await (self.call({"method": "getblockhash", "params": [index]}))
-            self.index_to_hash[index] = hash
-            return hash
+        return await self.call({"method": "getblockhash", "params": [index]})
 
     async def block(self, hash):
-        if hash in self.blocks:
-            return self.blocks[hash]
-        else:
-            block = await (self.call({"method": "getblock", "params": [hash]}))
-            self.blocks[hash] = block
-            return block
+        return await self.call({"method": "getblock", "params": [hash]})
 
     async def transaction(self, txid):
-        if txid in self.transactions:
-            return self.transactions[txid]
-        else:
-            transaction = await (self.call({"method": "getrawtransaction", "params": [txid, True]}))
-            self.transactions[txid] = transaction
-            return transaction
+        return await self.call({"method": "getrawtransaction", "params": [txid, True]})
 
     async def block_transactions(self, index):
         transactions = []
@@ -58,8 +41,7 @@ class BTCRPC:
         return transactions
 
     async def outputs(self, address):
-        result = (await self.info())
-        current = (await self.info())["result"]["blocks"]
+        current = (await self.info())["result"]["blocks"] - 1
         start = current - BLOCK_TAIL_LIMIT
         tasks = []
 
@@ -83,10 +65,21 @@ class BTCRPC:
                 return True
         return False
 
-    async def call(self, data):
+    async def call(self, data, cache=True):
+        payload = json.dumps(data)
+        tag = hash(payload)
         try:
-            async with self.session.post(URL, data=json.dumps(data)) as response:
-                return json.loads(await response.text())
+            if cache and tag in self.cache:
+                return self.cache[tag]
+            else:
+                async with self.session.post(URL, data=payload) as response:
+                    response = json.loads(await response.text())
+                    if cache:
+                        self.cache[tag] = response
+                    return response
         except Exception as e:
             log("Failed to call {}, {}".format(URL, repr(e)))
             return None
+
+    async def hash(self, string):
+        return hashlib.sha256(string.encode()).hexdigest()
