@@ -42,53 +42,57 @@ class BitcoinExplorer extends HTMLElement {
         });
     }
 
-    setError(response) {
+    _setStatus(response) {
         if (response.error) {
             this.hits.classList.add('error');
         } else {
             this.hits.classList.remove('error');
         }
+        clearInterval(this.loading);
     }
 
     _submit() {
         let index = /^[0-9]*$/.test(this.input.value);
         let transaction = this.input.value.length === 64; // hex encoded 256-bit hash.
 
-        if (this.input.value.length === 0) {
+        this.loading = setTimeout(() => {
             let placeholder = document.createElement('span');
-            this.hits.textContent = "";
+            this.hits.innerHTML = "";
             placeholder.id = "hits-placeholder";
             placeholder.innerHTML = "&#x1F680;";
+            placeholder.style.display = "block";
+            placeholder.style["padding-top"] = "96px";
+            placeholder.style["padding-left"] = "48px";
             this.placeholder = placeholder;
             this.hits.appendChild(placeholder);
+        }, 175);
+
+        if (index) {
+            this._index(parseInt(this.input.value));
+        } else if (transaction) {
+            this._txinfo(this.input.value);
         } else {
-            if (index) {
-                this._index(parseInt(this.input.value));
-            } else if (transaction) {
-                this._txinfo(this.input.value);
-            } else {
-                this._outputs(this.input.value);
-            }
+            this._outputs(this.input.value);
         }
     }
 
     _index(index) {
         bitcoin.blockhash(index).then(hash => bitcoin.block(hash)).then(block => {
-            this.setError(block);
+            this._setStatus(block);
             this.hits.textContent = JSON.stringify(block, null, 4);
         })
     }
 
     _txinfo(hash) {
         bitcoin.txinfo(hash).then(transaction => {
-            this.setError(transaction);
+            this._setStatus(transaction);
             hits.textContent = JSON.stringify(transaction, null, 4);
         });
     }
 
     _outputs(address) {
         bitcoin.outputs(address).then(outputs => {
-            this.setError(outputs);
+            this._setStatus(outputs);
             hits.textContent = JSON.stringify(outputs, null, 4);
         });
     }
@@ -193,16 +197,16 @@ class BitcoinExplorer extends HTMLElement {
 
                 #hits {
                     white-space: pre;
-                    min-height: 632px;
-                    max-height: 632px;
                     overflow-y: scroll;
                     margin: 32px 32px 16px;
+                    min-height: 55vh;
+                    max-height: 55vh;
                 }
 
                 #hits-placeholder {
                     font-size: 4em;
                     animation: rocket-x 1.5s ease infinite, rocket-y 1s linear infinite;
-                    display: block;
+                    display: inline-block;
                     text-align: center;
                 }
 
@@ -277,7 +281,7 @@ class BitcoinExplorer extends HTMLElement {
         this.hits = this.querySelector('#hits');
         this.stats = this.querySelector('#stats-container');
         this.footer = this.querySelector('#footer');
-        this.button = this.querySelector('#footer');
+        this.button = this.querySelector('bunny-button');
         this.placeholder = this.querySelector('#hits-placeholder');
         this.input.focus();
     }
