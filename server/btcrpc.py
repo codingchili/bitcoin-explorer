@@ -10,6 +10,9 @@ BLOCK_TAIL_LIMIT = 2000
 
 
 class BTCRPC:
+    """
+    Bitcoin node rpc integration.
+    """
 
     def __init__(self, username, password):
         con = aiohttp.TCPConnector(limit=128)

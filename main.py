@@ -5,6 +5,10 @@ from getpass import getpass
 from server import log as logger
 from server import web
 
+"""
+ Starts the event loop and retrieves the rpc user/pass to use for bitcoin json/rpc.
+"""
+
 try:
     if len(sys.argv) == 3:
         username = sys.argv[1]

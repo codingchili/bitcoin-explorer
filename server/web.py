@@ -5,6 +5,9 @@ from server.log import log
 
 
 class Server:
+    """
+    Serves static web resources and the REST API for the json/rpc bitcoin node integration.
+    """
 
     def __init__(self, username, password):
         self.rpc = BTCRPC(username, password)
