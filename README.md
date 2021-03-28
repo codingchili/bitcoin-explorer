@@ -19,4 +19,4 @@ Web resources
 - index.html & web/script/bitcoin-explorer.js - web ui 
 
 
-Built with a preview version of bunny-components :)
+Built with a preview version of bunny-components 🐰
