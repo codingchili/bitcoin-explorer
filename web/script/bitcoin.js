@@ -1,7 +1,7 @@
 export default class Bitcoin {
 
     call(method, data) {
-        return fetch(`http://localhost:8080/api/${method}`, {
+        return fetch(`/api/${method}`, {
             headers: {"Content-Type": "application/json"},
             method: "post",
             body: JSON.stringify(data ?? {})

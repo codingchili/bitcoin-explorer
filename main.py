@@ -10,10 +10,8 @@ try:
         username = sys.argv[1]
         password = sys.argv[2]
     else:
-        #username = input("rpc-username: ")
-        #password = getpass()
-        username = "userbob"
-        password = "secret"
+        username = input("rpc-username: ")
+        password = getpass()
 
     server = web.Server(username, password)
     loop = asyncio.get_event_loop()
