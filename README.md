@@ -17,3 +17,6 @@ Sources are in
 Web resources
 - web/script/bitcoin.js - server api integration. 
 - index.html & web/script/bitcoin-explorer.js - web ui 
+
+
+Built with a preview version of bunny-components :)
