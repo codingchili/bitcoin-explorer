@@ -1,9 +1,9 @@
 import asyncio
 import aiohttp
 import json
-import hashlib
 
 from server.log import log
+from server.address import *
 
 URL = "http://localhost:8332"
 BLOCK_TAIL_LIMIT = 2000
@@ -21,16 +21,25 @@ class BTCRPC:
         self.session = aiohttp.ClientSession(connector=con, auth=auth)
 
     async def info(self):
-        return await self.call({"method": "getblockchaininfo"}, cache=False)
+        return await self.call("getblockchaininfo")
 
     async def blockhash(self, index):
-        return await self.call({"method": "getblockhash", "params": [index]})
+        return await self.call("getblockhash", [index], cache=True)
 
     async def block(self, hash):
-        return await self.call({"method": "getblock", "params": [hash]})
+        return await self.call("getblock", [hash], cache=True)
 
     async def transaction(self, txid):
-        return await self.call({"method": "getrawtransaction", "params": [txid, True]})
+        return await self.call("getrawtransaction", [txid, True], cache=True)
+
+    async def send_transaction(self, address_from, address_to, amount, txid=None, vout=None):
+        inputs = [{"txid": txid, "vout": vout}]
+        outputs = [{address_to.compressed: amount}]
+
+        tx = await self.call("createrawtransaction", [inputs, outputs])
+        signed = await self.call("signrawtransactionwithkey", [tx["result"], [address_from.wif]])
+        sent = await self.call("sendrawtransaction", [signed["result"]["hex"], 0])
+        return sent["result"]
 
     async def block_transactions(self, index):
         transactions = []
@@ -68,7 +77,9 @@ class BTCRPC:
                 return True
         return False
 
-    async def call(self, data, cache=True):
+    async def call(self, method, params=[], cache=False):
+        data = {"method": method, "params": params}
+
         payload = json.dumps(data)
         tag = hash(payload)
         try:

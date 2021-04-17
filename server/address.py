@@ -10,21 +10,24 @@ class Address:
     """
 
     def __init__(self, uncompressed, compressed, private, public):
-        self.wif = Address.to_wif(private)
         self.compressed_hash = Address.__hash160(compressed)
-        self.compressed_address = Address.to_address(self.compressed_hash)
+        self.compressed = Address.to_address(self.compressed_hash)
         self.uncompressed_hash = Address.__hash160(uncompressed)
-        self.uncompressed_address = Address.to_address(self.uncompressed_hash)
-        self.public = public
-        self.private = private
+        self.uncompressed = Address.to_address(self.uncompressed_hash)
+        self.public = public.hex()
+
+        if private is not None:
+            self.private = private.hex()
+            self.wif = Address.to_wif(self.private)
+
 
     @staticmethod
     def to_address(hex_key, version="00"):
-        return Address.__checksum_hash(hex_key, prefix=version)
+        return Address.__checksum_hash(hex_key, prefix=version).decode("utf-8")
 
     @staticmethod
     def to_wif(private_key, network="80", keytype="01"):
-        return Address.__checksum_hash(private_key, prefix=network, postfix=keytype)
+        return Address.__checksum_hash(private_key, prefix=network, postfix=keytype).decode("utf-8")
 
     @staticmethod
     def __double_sha256(value):
@@ -47,12 +50,14 @@ class Address:
         return Address.create_from(public, private)
 
     @staticmethod
+    def create_public(public):
+        return Address.create_from(None, public)
+
+    @staticmethod
     def create_from(private, public):
         x, y = public[:len(public) // 2], public[len(public) // 2:]
         # prefix uncompressed with x04
         uncompressed = b"\x04" + x + y
         # prefix compressed key with x02 for even y, x03 for odd y.
         compressed = (b"\x02" if y[-1] % 2 == 0 else b"\x03") + x
-        print(x.hex())
-        return Address(uncompressed, compressed, private.hex(), public.hex())
-
+        return Address(uncompressed, compressed, private, public)
