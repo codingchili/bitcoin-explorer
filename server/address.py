@@ -47,7 +47,7 @@ class Address:
         generated = ecdsa.SigningKey.generate(curve=ecdsa.SECP256k1)
         private = generated.to_string()
         public = generated.get_verifying_key().to_string()
-        return Address.create_from(public, private)
+        return Address.create_from(private, public)
 
     @staticmethod
     def create_public(public):

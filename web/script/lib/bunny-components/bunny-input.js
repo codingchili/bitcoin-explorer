@@ -39,7 +39,11 @@ class BunnyInput extends HTMLElement {
     }
 
     get value() {
-        return this.input.value;
+        if (this.input.value.length === 0) {
+            return this.placeholder;
+        } else {
+            return this.input.value;
+        }
     }
 
     static get is() {

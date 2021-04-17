@@ -32,12 +32,12 @@ class BTCRPC:
     async def transaction(self, txid):
         return await self.call("getrawtransaction", [txid, True], cache=True)
 
-    async def send_transaction(self, address_from, address_to, amount, txid=None, vout=None):
+    async def send_transaction(self, address_from, address_to, amount, txid, vout):
         inputs = [{"txid": txid, "vout": vout}]
-        outputs = [{address_to.compressed: amount}]
+        outputs = [{address_to: amount}]
 
         tx = await self.call("createrawtransaction", [inputs, outputs])
-        signed = await self.call("signrawtransactionwithkey", [tx["result"], [address_from.wif]])
+        signed = await self.call("signrawtransactionwithkey", [tx["result"], [address_from]])
         sent = await self.call("sendrawtransaction", [signed["result"]["hex"], 0])
         return sent["result"]
 

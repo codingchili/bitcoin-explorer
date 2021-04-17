@@ -34,6 +34,19 @@ class Server:
     async def index(self, request):
         return web.FileResponse('./web/index.html')
 
+    async def address(self, request):
+        return web.json_response(Address.generate().__dict__)
+
+    async def transact(self, request):
+        request = (await request.json())
+        return web.json_response(self.rpc.send_transaction(
+            request["wif_from"],
+            request["compressed_to"],
+            request["amount"],
+            request["transaction"],
+            request["output"]
+        ))
+
     def serve(self):
         log("serving contents of /web.")
         app = web.Application()
@@ -43,7 +56,9 @@ class Server:
             web.post('/api/blockhash', self.blockhash),
             web.post('/api/block', self.block),
             web.post('/api/txinfo', self.txinfo),
-            web.post('/api/outputs', self.outputs)
+            web.post('/api/outputs', self.outputs),
+            web.get('/api/address', self.address),
+            web.post('/api/transact', self.transact)
         ])
         app.router.add_static('/', './web')
         web.run_app(app)

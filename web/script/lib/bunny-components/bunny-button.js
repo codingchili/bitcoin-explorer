@@ -55,7 +55,7 @@ class BunnyButton extends HTMLElement {
                 }
 
                 .button {
-                    min-width: 5.14em;
+                    /*min-width: 5.14em;*/
                     height: 2.4em;
                     text-transform: uppercase;
                     /*position: relative;*/

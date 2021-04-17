@@ -25,9 +25,10 @@ class BunnyTab extends HTMLElement {
     }
 
     connectedCallback() {
+        this.underline = !this.hasAttribute("no-underline");
         this.attachShadow({mode: 'open'});
-        render(this.template, this.shadowRoot);
 
+        render(this.template, this.shadowRoot);
         this.tab = this.shadowRoot.querySelector('.tab');
     }
 
@@ -62,10 +63,11 @@ class BunnyTab extends HTMLElement {
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                transition: background-color 0.4s ease;
             }
             
             .active {
-                border-bottom: 2px solid var(--bunny-tab-active, rgb(0, 176, 255));
+                ${this.underline ? `border-bottom: 2px solid var(--bunny-tab-active, rgb(0, 176, 255));` : ''}
                 background-color: var(--bunny-tab-background-active, #424242);
             }
             
@@ -90,7 +92,7 @@ class BunnyTab extends HTMLElement {
               }
         </style>
         
-        <div class="tab" onmousedown="this.getRootNode().host.onclicked()">
+        <div onmousedown="this.getRootNode().host.onclicked()">
             <div class="tab">
                 <slot></slot>            
             </div>

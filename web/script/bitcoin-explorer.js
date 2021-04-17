@@ -3,7 +3,11 @@ import {html, render} from '/node_modules/lit-html/lit-html.js'
 import './lib/bunny-components/bunny-box.js'
 import './lib/bunny-components/bunny-input.js'
 import './lib/bunny-components/bunny-button.js'
+import './lib/bunny-components/bunny-tooltip.js'
 import './bitcoin.js'
+
+import './dialog-address.js'
+import './dialog-transaction.js'
 
 class BitcoinExplorer extends HTMLElement {
 
@@ -259,6 +263,33 @@ class BitcoinExplorer extends HTMLElement {
                 </div>
             </bunny-box>
 
+            <div id="actions">
+                <style>
+                    #actions {
+                        position: absolute;
+                        right: 32px;
+                        bottom: 32px;
+                    }
+
+                    .floating {
+                        margin-top: 8px;
+                        width: 42px;
+                        border-radius: 32px;
+                    }
+                </style>
+                <div style="position: relative;">
+                    <bunny-button class="floating" primary
+                                  @mousedown="${this._showTransactionDialog.bind(this)}">💰
+                    </bunny-button>
+                    <bunny-tooltip location="left">Send transaction</bunny-tooltip>
+                    
+                    <bunny-button class="floating" primary
+                                  @mousedown="${this._showAddressDialog.bind(this)}">🏷
+                    </bunny-button>
+                    <bunny-tooltip location="left">Add address</bunny-tooltip>
+                </div>
+            </div>
+
             <style>
                 #footer {
                     position: fixed;
@@ -266,9 +297,28 @@ class BitcoinExplorer extends HTMLElement {
                     text-align: center;
                     width: 100%;
                 }
+
+                #footer-text {
+                    display: block;
+                    margin: auto;
+                    min-width: 256px;
+                }
             </style>
-            <div id="footer"></div>
+            <div id="footer">
+                <span id="footer-text"></span>
+            </div>
+
+            <dialog-address></dialog-address>
+            <dialog-transaction></dialog-transaction>
         `
+    }
+
+    _showAddressDialog() {
+        this.querySelector("dialog-address").open();
+    }
+
+    _showTransactionDialog() {
+        this.querySelector('dialog-transaction').open();
     }
 
     render() {
@@ -280,7 +330,7 @@ class BitcoinExplorer extends HTMLElement {
         this.input = this.querySelector('bunny-input');
         this.hits = this.querySelector('#hits');
         this.stats = this.querySelector('#stats-container');
-        this.footer = this.querySelector('#footer');
+        this.footer = this.querySelector('#footer-text');
         this.button = this.querySelector('bunny-button');
         this.placeholder = this.querySelector('#hits-placeholder');
         this.input.focus();
