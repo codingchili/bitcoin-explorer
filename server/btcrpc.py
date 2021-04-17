@@ -37,8 +37,11 @@ class BTCRPC:
         outputs = [{address_to: amount}]
 
         tx = await self.call("createrawtransaction", [inputs, outputs])
+        print(tx["result"])
         signed = await self.call("signrawtransactionwithkey", [tx["result"], [address_from]])
+        print(signed["result"])
         sent = await self.call("sendrawtransaction", [signed["result"]["hex"], 0])
+        print(sent["result"])
         return sent["result"]
 
     async def block_transactions(self, index):

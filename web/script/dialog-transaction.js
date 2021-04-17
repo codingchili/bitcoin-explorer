@@ -53,7 +53,7 @@ class DialogTransaction extends HTMLElement {
                     right: 0;
                     left: 0;
                     bottom: 0;
-                    width: 592px;
+                    width: 662px;
                     height: fit-content;
                     margin: auto;
                     /*transform: translateY(-50%);*/
@@ -168,16 +168,15 @@ class DialogTransaction extends HTMLElement {
             compressed_to: this.receiver.address,
             amount: this.amountInput.value,
             transaction: this.transactionInput.value,
-            output: this.indexInput.value,
+            output: parseInt(this.indexInput.value),
         };
-        console.log(payload);
-        /*fetch('/api/transact', {
+        fetch('/api/transact', {
             method: 'post',
-            body: JSON.stringify()
+            body: JSON.stringify(payload)
         }).then(response => response.json())
             .then(() => {
                 this.close();
-            });*/
+            });
     }
 
     render() {

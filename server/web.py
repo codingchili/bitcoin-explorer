@@ -39,7 +39,7 @@ class Server:
 
     async def transact(self, request):
         request = (await request.json())
-        return web.json_response(self.rpc.send_transaction(
+        return web.json_response(await self.rpc.send_transaction(
             request["wif_from"],
             request["compressed_to"],
             request["amount"],
