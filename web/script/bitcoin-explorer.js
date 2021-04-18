@@ -20,7 +20,7 @@ class BitcoinExplorer extends HTMLElement {
             }
         })
         this._update();
-        setInterval(this._update.bind(this), 1000);
+        setInterval(this._update.bind(this), 5000);
     }
 
     _update() {
@@ -268,7 +268,7 @@ class BitcoinExplorer extends HTMLElement {
                     #actions {
                         position: absolute;
                         right: 32px;
-                        bottom: 32px;
+                        bottom: 52px;
                     }
 
                     .floating {

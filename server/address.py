@@ -3,6 +3,8 @@ import hashlib
 import ecdsa
 import binascii
 
+from server.log import log
+
 
 class Address:
     """
@@ -19,7 +21,6 @@ class Address:
         if private is not None:
             self.private = private.hex()
             self.wif = Address.to_wif(self.private)
-
 
     @staticmethod
     def to_address(hex_key, version="00"):
@@ -47,6 +48,9 @@ class Address:
         generated = ecdsa.SigningKey.generate(curve=ecdsa.SECP256k1)
         private = generated.to_string()
         public = generated.get_verifying_key().to_string()
+        # not logged for security reasons.
+        # log(f"generated private key '{private.hex()}'")
+        log(f"generated public key '{public.hex()}'")
         return Address.create_from(private, public)
 
     @staticmethod
@@ -61,3 +65,14 @@ class Address:
         # prefix compressed key with x02 for even y, x03 for odd y.
         compressed = (b"\x02" if y[-1] % 2 == 0 else b"\x03") + x
         return Address(uncompressed, compressed, private, public)
+
+
+# run this to verify against assignment requirements on key/address formatting.
+if __name__ == '__main__':
+    address = Address.generate()
+    print(f"public (hex): {address.public}")
+    print(f"compressed: {address.compressed}")
+    print(f"uncompressed: {address.uncompressed}")
+    print(f"wif: {address.wif}")
+    print(f"private (hex): {address.private}")
+    print(f"private (int): {int(address.private, 16)}")

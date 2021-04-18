@@ -3,6 +3,7 @@ import {html, render} from '/node_modules/lit-html/lit-html.js'
 import './lib/bunny-components/bunny-button.js'
 import './lib/bunny-components/bunny-input.js'
 import './lib/bunny-components/bunny-tab.js'
+import './lib/bunny-components/bunny-toast.js'
 
 import {AddressBook} from './addressbook.js';
 
@@ -35,6 +36,14 @@ class DialogTransaction extends HTMLElement {
                     --bunny-tab-background: #212121;
                     --bunny-tab-background-active: rgba(0, 110, 123, 0.51);
                 }
+                
+                bunny-toast.error {
+                    --toast-text-color: #ff0000;
+                }
+                
+                bunny-toast.success {
+                    --toast-text-color: #00ff00;
+                }
 
                 #overlay {
                     position: absolute;
@@ -42,7 +51,7 @@ class DialogTransaction extends HTMLElement {
                     right: 0;
                     left: 0;
                     bottom: 0;
-                    opacity: 0.42;
+                    /*opacity: 0;*/
                     background-color: #212121;
                 }
 
@@ -99,9 +108,43 @@ class DialogTransaction extends HTMLElement {
                 #amount {
                     padding-bottom: 16px;
                 }
+
+                #close {
+                    position: absolute;
+                    bottom: 64px;
+                    left: 0px;
+                    right: 0px;
+                    text-align: center;
+                    margin: auto;
+                    opacity: 0.64;
+                }
+                
+                #receivers, #senders {
+                    max-height: 168px;
+                    overflow-y: scroll;
+                }
+
+                *::-webkit-scrollbar {
+                    width: 0.4em;
+                    height: 0.4em;
+                }
+
+                *::-webkit-scrollbar-track {
+                    background-color: #00000000;
+                }
+
+                *::-webkit-scrollbar-thumb {
+                    background-color: #646464;
+                }
+
+                ::selection {
+                    color: rgb(0, 176, 255);
+                }
             </style>
 
-            <div id="overlay" @click="${this.close.bind(this)}"></div>
+            <div id="overlay" @click="${this.close.bind(this)}">
+                <span id="close" @mousedown="${() => this.close()}">Click anywhere to close</span>
+            </div>
             <bunny-box id="dialog" border solid>
                 <div id="dialog-content">
                     <div class="label">From</div>
@@ -147,6 +190,9 @@ class DialogTransaction extends HTMLElement {
                     <bunny-button @click="${this.sendTransaction.bind(this)}">Send</bunny-button>
                 </div>
             </bunny-box>
+            
+            <bunny-toast class="error"></bunny-toast>
+            <bunny-toast class="success"></bunny-toast>
         `;
     }
 
@@ -174,8 +220,15 @@ class DialogTransaction extends HTMLElement {
             method: 'post',
             body: JSON.stringify(payload)
         }).then(response => response.json())
-            .then(() => {
-                this.close();
+            .then(response => {
+                if (response.code < 0) {
+                    this.shadowRoot.querySelector('bunny-toast.error')
+                        .open(response.message, 4000)
+                } else {
+                    this.shadowRoot.querySelector('bunny-toast.success')
+                        .open(`Created tx ${response.result}`, 6000)
+                    this.close();
+                }
             });
     }
 

@@ -56,7 +56,7 @@ class DialogAddress extends HTMLElement {
                     right: 0;
                     left: 0;
                     bottom: 0;
-                    opacity: 0.42;
+                    /*opacity: 0;*/
                     background-color: #212121;
                 }
 
@@ -84,9 +84,21 @@ class DialogAddress extends HTMLElement {
                     left: 0;
                     right: 0;
                 }
+                
+                #close {
+                    position: absolute;
+                    bottom: 64px;
+                    left: 0px;
+                    right: 0px;
+                    text-align: center;
+                    margin: auto;
+                    opacity: 0.64;
+                }
             </style>
 
-            <div id="overlay" @click="${this.close.bind(this)}"></div>
+            <div id="overlay" @click="${this.close.bind(this)}">
+                <span id="close" @mousedown="${() => this.close()}">Click anywhere to close</span>
+            </div>
             <bunny-box id="dialog" border solid>
                 <div id="dialog-content">
                     <div style="display: flex; justify-content: space-between">
@@ -103,7 +115,7 @@ class DialogAddress extends HTMLElement {
 
     get publicAddressTemplate() {
         return html`
-            <bunny-input id="compressed" label="compressed" placeholder="0x3918AE1..">${this.public}</bunny-input>
+            <bunny-input id="compressed" label="compressed" placeholder="bc1qefysc0jm3xckaetkugvpcztrq7rqpw7tjad4ax">${this.public}</bunny-input>
         `;
     }
 

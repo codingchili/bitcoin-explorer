@@ -17,7 +17,7 @@ class BunnyToast extends HTMLElement {
         render(this.template, this.shadowRoot);
     }
 
-    open(text) {
+    open(text, duration) {
         this.text = text;
         let template = this.shadowRoot.querySelector('template');
         template.content.querySelector('.toast-text').textContent = text;
@@ -28,8 +28,8 @@ class BunnyToast extends HTMLElement {
 
         document.documentElement.appendChild(tooltip);
 
-        setTimeout(() => this.bar.style.height = '36px', 0);
-        setTimeout(() => this.close(bar), this.duration);
+        setTimeout(() => this.bar.style.height = '36px', 16);
+        setTimeout(() => this.close(bar), duration ?? this.duration);
     }
 
     close(bar) {
@@ -57,14 +57,16 @@ class BunnyToast extends HTMLElement {
                     height: 0;
                     position: absolute;
                     overflow-y: hidden;">
-                    <span class="toast-text" style="
+                    <div class="toast-text" style="
                         font-family: 'RoboX';
                         position: absolute;
+                        font-size: medium;
+                        user-select: all;
+                        color: ${getComputedStyle(this).getPropertyValue("--toast-text-color")};
                         top: 12px;
                         left: 0;
                         right: 0;                    
-                    "
-                    >${this.text}</span>
+                    ">${this.text}</div>
                 </bunny-bar>
             </template>
         `;

@@ -19,6 +19,7 @@ class BTCRPC:
         auth = aiohttp.BasicAuth(username, password)
         self.cache = {}
         self.session = aiohttp.ClientSession(connector=con, auth=auth)
+        log(f"using rpc node with user '{username}'")
 
     async def info(self):
         return await self.call("getblockchaininfo")
@@ -37,12 +38,25 @@ class BTCRPC:
         outputs = [{address_to: amount}]
 
         tx = await self.call("createrawtransaction", [inputs, outputs])
-        print(tx["result"])
-        signed = await self.call("signrawtransactionwithkey", [tx["result"], [address_from]])
-        print(signed["result"])
-        sent = await self.call("sendrawtransaction", [signed["result"]["hex"], 0])
-        print(sent["result"])
-        return sent["result"]
+
+        if tx["error"] is None:
+            signed = await self.call("signrawtransactionwithkey", [tx["result"], [address_from]])
+            if signed["error"] is None:
+                sent = await self.call("sendrawtransaction", [signed["result"]["hex"], 0])
+                if sent["result"] is not None:
+                    log(f"created tx {sent['result']}")
+                return self.parse_response(sent)
+            else:
+                return self.parse_response(signed)
+        else:
+            return self.parse_response(tx)
+
+    def parse_response(self, response):
+        if response["error"] is not None:
+            log(response["error"]["message"])
+            return response["error"]
+        else:
+            return response
 
     async def block_transactions(self, index):
         transactions = []
@@ -82,6 +96,7 @@ class BTCRPC:
 
     async def call(self, method, params=[], cache=False):
         data = {"method": method, "params": params}
+        log(f"invoking rpc call '{method}'")
 
         payload = json.dumps(data)
         tag = hash(payload)
