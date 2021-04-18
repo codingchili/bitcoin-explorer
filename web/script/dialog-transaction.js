@@ -120,7 +120,7 @@ class DialogTransaction extends HTMLElement {
                 }
                 
                 #receivers, #senders {
-                    max-height: 168px;
+                    max-height: 180px;
                     overflow-y: scroll;
                 }
 
