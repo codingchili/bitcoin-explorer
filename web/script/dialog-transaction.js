@@ -236,6 +236,7 @@ class DialogTransaction extends HTMLElement {
                     this.transactionInput.clear();
                     this.indexInput.clear();
                     this.transactionInput.clear();
+                    this.amountInput.clear();
                     this.close();
                 }
             });
