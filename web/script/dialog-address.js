@@ -19,7 +19,8 @@ class DialogAddress extends HTMLElement {
             "Candy's Plaza",
             "Elliot's Vegan Hamburger Bar",
             "That place on the corner",
-            "Starbucks"
+            "Starbucks",
+            "BTC Pizza Express"
         ]
     }
 
@@ -36,6 +37,7 @@ class DialogAddress extends HTMLElement {
         this.public = null;
         this.suggestion = this.names[Math.round(Math.random() * (this.names.length - 1))];
         this.render();
+        this.addressInput.focus();
     }
 
     close() {
@@ -134,6 +136,10 @@ class DialogAddress extends HTMLElement {
             wif: this.publicAddress ? null : this.wifInput.value
         };
         AddressBook.add(address);
+
+        this.nameInput.clear();
+        this.wifInput?.clear();
+        this.addressInput.clear();
         this.close();
     }
 
@@ -141,6 +147,7 @@ class DialogAddress extends HTMLElement {
         this.publicAddress = e.detail.active;
         if (this.publicAddress) {
             this.render();
+            this.addressInput.focus();
         } else {
             // server call to generate
             fetch('/api/address')
@@ -149,6 +156,7 @@ class DialogAddress extends HTMLElement {
                     this.wif = address.wif;
                     this.private = address.compressed;
                     this.render();
+                    this.nameInput.focus();
                 })
         }
     }

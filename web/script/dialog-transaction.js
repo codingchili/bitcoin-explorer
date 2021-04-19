@@ -36,11 +36,11 @@ class DialogTransaction extends HTMLElement {
                     --bunny-tab-background: #212121;
                     --bunny-tab-background-active: rgba(0, 110, 123, 0.51);
                 }
-                
+
                 bunny-toast.error {
                     --toast-text-color: #ff0000;
                 }
-                
+
                 bunny-toast.success {
                     --toast-text-color: #00ff00;
                 }
@@ -118,7 +118,7 @@ class DialogTransaction extends HTMLElement {
                     margin: auto;
                     opacity: 0.64;
                 }
-                
+
                 #receivers, #senders {
                     max-height: 180px;
                     overflow-y: scroll;
@@ -185,12 +185,12 @@ class DialogTransaction extends HTMLElement {
                     </div>
                     <div style="margin-top: 16px;"></div>
                     <bunny-input id="transaction" label="Transaction id"></bunny-input>
-                    <bunny-input id="index" label="Input #"></bunny-input>
+                    <bunny-input id="index" label="Output #"></bunny-input>
                     <bunny-input id="amount" label="BTC"></bunny-input>
                     <bunny-button @click="${this.sendTransaction.bind(this)}">Send</bunny-button>
                 </div>
             </bunny-box>
-            
+
             <bunny-toast class="error"></bunny-toast>
             <bunny-toast class="success"></bunny-toast>
         `;
@@ -211,8 +211,9 @@ class DialogTransaction extends HTMLElement {
     sendTransaction() {
         let payload = {
             wif_from: this.sender.wif,
+            compressed_from: this.sender.address,
             compressed_to: this.receiver.address,
-            amount: this.amountInput.value,
+            amount: parseFloat(this.amountInput.value),
             transaction: this.transactionInput.value,
             output: parseInt(this.indexInput.value),
         };
@@ -227,6 +228,14 @@ class DialogTransaction extends HTMLElement {
                 } else {
                     this.shadowRoot.querySelector('bunny-toast.success')
                         .open(`Created tx ${response.result}`, 6000)
+
+                    this.dispatchEvent(new CustomEvent('tx-created', {
+                            detail: {txid: response.result}
+                        }
+                    ));
+                    this.transactionInput.clear();
+                    this.indexInput.clear();
+                    this.transactionInput.clear();
                     this.close();
                 }
             });

@@ -7,6 +7,7 @@ from server.address import *
 
 URL = "http://localhost:8332"
 BLOCK_TAIL_LIMIT = 2000
+TX_FEE_RATIO = 0.1
 
 
 class BTCRPC:
@@ -33,14 +34,37 @@ class BTCRPC:
     async def transaction(self, txid):
         return await self.call("getrawtransaction", [txid, True], cache=True)
 
-    async def send_transaction(self, address_from, address_to, amount, txid, vout):
-        inputs = [{"txid": txid, "vout": vout}]
-        outputs = [{address_to: amount}]
+    async def transaction_io(self, txid, vout, amount, address_from, address_to):
+        # retrieve transaction output to spend, refund address_from with remainder.
+        spendable = (await self.transaction(txid))
+        if spendable["error"] is not None:
+            return self.parse_response(spendable)
 
+        spendable_value = round(spendable["result"]["vout"][vout]["value"], 2)
+
+        return {
+            "inputs": [{"txid": txid, "vout": vout}],
+            "outputs": [
+                {address_to: f"{amount:.4f}"},
+                {address_from: f"{(spendable_value - (amount * TX_FEE_RATIO) - amount):.4f}"}
+            ],
+            "error": None
+        }
+
+    async def send_transaction(self, wif, address_from, address_to, amount, txid, vout):
+        io = await self.transaction_io(txid, vout, amount, address_from, address_to)
+
+        if io["inputs"] is None:
+            return io
+        else:
+            outputs = io["outputs"]
+            inputs = io["inputs"]
+
+        # creates a replaceable transaction.
         tx = await self.call("createrawtransaction", [inputs, outputs])
 
         if tx["error"] is None:
-            signed = await self.call("signrawtransactionwithkey", [tx["result"], [address_from]])
+            signed = await self.call("signrawtransactionwithkey", [tx["result"], [wif]])
             if signed["error"] is None:
                 sent = await self.call("sendrawtransaction", [signed["result"]["hex"], 0])
                 if sent["result"] is not None:

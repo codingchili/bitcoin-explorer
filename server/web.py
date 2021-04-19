@@ -41,6 +41,7 @@ class Server:
         request = (await request.json())
         return web.json_response(await self.rpc.send_transaction(
             request["wif_from"],
+            request["compressed_from"],
             request["compressed_to"],
             request["amount"],
             request["transaction"],

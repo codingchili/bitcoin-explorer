@@ -88,6 +88,7 @@ class BitcoinExplorer extends HTMLElement {
     }
 
     _txinfo(hash) {
+        this.input.value = hash;
         bitcoin.txinfo(hash).then(transaction => {
             this._setStatus(transaction);
             hits.textContent = JSON.stringify(transaction, null, 4);
@@ -309,7 +310,7 @@ class BitcoinExplorer extends HTMLElement {
             </div>
 
             <dialog-address></dialog-address>
-            <dialog-transaction></dialog-transaction>
+            <dialog-transaction @tx-created="${(e => this._txinfo(e.detail.txid))}"></dialog-transaction>
         `
     }
 

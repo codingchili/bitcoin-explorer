@@ -61,7 +61,6 @@ class BunnyToast extends HTMLElement {
                         font-family: 'RoboX';
                         position: absolute;
                         font-size: medium;
-                        user-select: all;
                         color: ${getComputedStyle(this).getPropertyValue("--toast-text-color")};
                         top: 12px;
                         left: 0;

@@ -30,7 +30,7 @@ class BunnyInput extends HTMLElement {
     }
 
     clear() {
-        this.input.value = '';
+        this.value = '';
     }
 
     set value(value) {
