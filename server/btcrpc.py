@@ -31,6 +31,9 @@ class BTCRPC:
     async def block(self, hash):
         return await self.call("getblock", [hash], cache=True)
 
+    async def blocktemplate(self):
+        return await self.call("getblocktemplate", [{"rules": ["segwit"], "capabilities": ["coinbasetxn", "workid", "coinbase/append"]}])
+
     async def transaction(self, txid):
         return await self.call("getrawtransaction", [txid, True], cache=True)
 
