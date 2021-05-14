@@ -2,6 +2,7 @@ from aiohttp import web
 
 from server.btcrpc import *
 from server.log import log
+from server.mining import stripmine
 
 
 class Server:
@@ -18,6 +19,10 @@ class Server:
     async def blockhash(self, request):
         index = (await request.json())["index"]
         return web.json_response(await self.rpc.blockhash(index))
+
+    async def mine(self, request):
+        template = (await self.rpc.blocktemplate())
+        return web.json_response(await stripmine(template))
 
     async def block(self, request):
         index = (await request.json())["hash"]
@@ -56,6 +61,7 @@ class Server:
             web.post('/api/info', self.info),
             web.post('/api/blockhash', self.blockhash),
             web.post('/api/block', self.block),
+            web.post('/api/minecraft', self.mine),
             web.post('/api/txinfo', self.txinfo),
             web.post('/api/outputs', self.outputs),
             web.get('/api/address', self.address),
