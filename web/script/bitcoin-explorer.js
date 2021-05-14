@@ -8,6 +8,7 @@ import './bitcoin.js'
 
 import './dialog-address.js'
 import './dialog-transaction.js'
+import './bitcoin-miner.js'
 
 class BitcoinExplorer extends HTMLElement {
 
@@ -280,6 +281,11 @@ class BitcoinExplorer extends HTMLElement {
                 </style>
                 <div style="position: relative;">
                     <bunny-button class="floating" primary
+                                  @mousedown="${this._mine.bind(this)}">⛏
+                    </bunny-button>
+                    <bunny-tooltip location="left">Mine block</bunny-tooltip>
+                    
+                    <bunny-button class="floating" primary
                                   @mousedown="${this._showTransactionDialog.bind(this)}">💰
                     </bunny-button>
                     <bunny-tooltip location="left">Send transaction</bunny-tooltip>
@@ -309,9 +315,14 @@ class BitcoinExplorer extends HTMLElement {
                 <span id="footer-text"></span>
             </div>
 
+            <bitcoin-miner></bitcoin-miner>
             <dialog-address></dialog-address>
             <dialog-transaction @tx-created="${(e => this._txinfo(e.detail.txid))}"></dialog-transaction>
         `
+    }
+
+    _mine() {
+        this.querySelector('bitcoin-miner').start();
     }
 
     _showAddressDialog() {

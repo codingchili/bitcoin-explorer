@@ -15,7 +15,7 @@ async def stripmine(template):
     """ spawns child processes to perform concurrent mining with the given template. """
     loop = asyncio.get_event_loop()
     executor = concurrent.futures.ProcessPoolExecutor(max_workers=workers)
-    worker_range = 0xfffff  # range per worker, reduced to limit mining to ~20s.
+    worker_range = 0x0004ffff  # range per worker, reduced to limit mining to ~10s.
     tasks = set()
     start = time.time()
 
@@ -43,7 +43,7 @@ def hash_nonce_range(template, nonce_from, nonce_to, report):
 
     for i in range(nonce_from, nonce_to):
         header = get_header(template, merkle, i)
-        hash = bytes_to_string(x2_sha256(header))
+        hash = bytes_to_string(x2_sha256(header)[::-1])
 
         if report and i % 20_000 == 0:
             log(f"hashing progress {int(abs((nonce_from - i / nonce_to - nonce_from)) * 100)}%")
@@ -66,6 +66,7 @@ def find_best_block(hashed):
     proposed_block = None
     for item in hashed[0]:
         block = item.result()
+        print(block["hash"])
         if proposed_block is None or block["hash"] < proposed_block["hash"]:
             proposed_block = block
 
@@ -80,16 +81,16 @@ def get_header(template, merkle, nonce=1):
     timestamp = to_bytes(int(time.time()), 4)
     bits = unhexlify(template['bits'][::-1])
     nonce = to_bytes(nonce, 4)
-    txcount = b'\x01'
 
-    header = (version + previous + merkle + timestamp + bits + nonce + txcount)
+    header = (version + previous + merkle + timestamp + bits + nonce)
     return header
 
 
 def get_transaction(template):
     """ transaction header """
+    txcount = b'\x01'
     txver = b'\x01\x00\x00\x00'
-    return txver + get_inputs(template) + get_outputs(template)
+    return txcount + txver + get_inputs(template) + get_outputs(template)
 
 
 def get_inputs(template):
@@ -115,7 +116,7 @@ def get_outputs(template):
 
 
 def bytes_to_string(rawbytes):
-    return binascii.hexlify(rawbytes).decode()
+    return hexlify(rawbytes).decode()
 
 
 def x2_sha256(b):

@@ -1,4 +1,5 @@
 from aiohttp import web
+from binascii import *
 
 from server.btcrpc import *
 from server.log import log
@@ -10,8 +11,8 @@ class Server:
     Serves static web resources and the REST API for the json/rpc bitcoin node integration.
     """
 
-    def __init__(self, username, password):
-        self.rpc = BTCRPC(username, password)
+    def __init__(self, rpc):
+        self.rpc = rpc
 
     async def info(self, request):
         return web.json_response(await self.rpc.info())
@@ -21,8 +22,12 @@ class Server:
         return web.json_response(await self.rpc.blockhash(index))
 
     async def mine(self, request):
-        template = (await self.rpc.blocktemplate())
-        return web.json_response(await stripmine(template))
+        template = (await self.rpc.blocktemplate())["result"]
+        result = await stripmine(template)
+        return web.json_response({
+            "block": hexlify(result["block"]).decode(),
+            "valid": result["valid"]
+        })
 
     async def block(self, request):
         index = (await request.json())["hash"]
