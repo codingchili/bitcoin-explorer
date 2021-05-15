@@ -22,6 +22,9 @@ class BTCRPC:
         self.session = aiohttp.ClientSession(connector=con, auth=auth)
         log(f"using rpc node with user '{username}'")
 
+    async def close(self):
+        await self.session.close()
+
     async def info(self):
         return await self.call("getblockchaininfo")
 

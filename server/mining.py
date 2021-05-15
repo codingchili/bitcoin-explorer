@@ -7,7 +7,7 @@ from binascii import *
 import time
 
 coinbase = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-address = '76a914071e31b8289aa9d80b970230cb1b8b76466f2ec488ac'
+address = '2e26df868c171df6ac5ed6349ff11359faf89276cf96d4e438b05b04928accc7'
 workers = 16
 
 
@@ -15,13 +15,13 @@ async def stripmine(template):
     """ spawns child processes to perform concurrent mining with the given template. """
     loop = asyncio.get_event_loop()
     executor = concurrent.futures.ProcessPoolExecutor(max_workers=workers)
-    worker_range = 0x0004ffff  # range per worker, reduced to limit mining to ~10s.
+    worker_range = 0x0004ffff  # range per worker, reduced to limit mining to ~5s.
     tasks = set()
     start = time.time()
 
     for i in range(0, workers):
         range_from, range_to = i * worker_range, (i + 1) * worker_range
-        log(f"started hash worker {i} for range {range_from}->{range_to} ..")
+        log(f"started worker #{i}, range: {range_from}->{range_to} ..")
         tasks.add(loop.run_in_executor(executor, hash_nonce_range, template, range_from, range_to, i == 0))
 
     blocks = await asyncio.wait(fs=tasks, return_when=asyncio.ALL_COMPLETED)
@@ -35,23 +35,31 @@ async def stripmine(template):
     return proposed_block
 
 
+def merkle_root(transactions):
+    """
+     calculate the merkle root for a list of transactions, only supports a single
+     transaction so the root is the hash of the single tx.
+     """
+    return x2_sha256(transactions[0])
+
+
 def hash_nonce_range(template, nonce_from, nonce_to, report):
     """ finds the nonce which gives the best (lowest) block hash in the given nonce range. """
     proposed_block = None
-    transactions = get_transaction(template)
-    merkle = x2_sha256(transactions)
+    transactions = get_transactions(template)
+    merkle = merkle_root(transactions)
 
     for i in range(nonce_from, nonce_to):
         header = get_header(template, merkle, i)
         hash = bytes_to_string(x2_sha256(header)[::-1])
 
         if report and i % 20_000 == 0:
-            log(f"hashing progress {int(abs((nonce_from - i / nonce_to - nonce_from)) * 100)}%")
+            log(f"mining progress {int(abs((nonce_from - i / nonce_to - nonce_from)) * 100)}% ..")
 
         if proposed_block is None or hash < proposed_block["hash"]:
             proposed_block = {
                 "hash": hash,
-                "block": header + transactions,
+                "block": header + len(transactions).to_bytes(1, 'little') + b''.join(transactions),
                 "valid": hash < template["target"]
             }
 
@@ -66,9 +74,11 @@ def find_best_block(hashed):
     proposed_block = None
     for item in hashed[0]:
         block = item.result()
-        print(block["hash"])
+        #print(block["hash"])
         if proposed_block is None or block["hash"] < proposed_block["hash"]:
             proposed_block = block
+
+    log(f"best block candidate '0x{proposed_block['hash'][0:12]}..', meets target: {proposed_block['valid']}")
 
     return proposed_block
 
@@ -86,11 +96,11 @@ def get_header(template, merkle, nonce=1):
     return header
 
 
-def get_transaction(template):
+def get_transactions(template):
     """ transaction header """
-    txcount = b'\x01'
+    # txcount = b'\x01'
     txver = b'\x01\x00\x00\x00'
-    return txcount + txver + get_inputs(template) + get_outputs(template)
+    return [txver + get_inputs(template) + get_outputs(template)]
 
 
 def get_inputs(template):
